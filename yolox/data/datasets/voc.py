@@ -60,10 +60,11 @@ class AnnotationTransform(object):
                 continue
             name = obj.find("name").text.strip()
             bbox = obj.find("bndbox")
-
             pts = ["xmin", "ymin", "xmax", "ymax"]
             bndbox = []
             for i, pt in enumerate(pts):
+                #print("#########################################################################################bbox.find(pt).text:")
+                #print(bbox.find(pt).text)
                 cur_pt = int(bbox.find(pt).text) - 1
                 # scale height or width
                 # cur_pt = cur_pt / width if i % 2 == 0 else cur_pt / height
@@ -72,9 +73,13 @@ class AnnotationTransform(object):
             bndbox.append(label_idx)
             res = np.vstack((res, bndbox))  # [xmin, ymin, xmax, ymax, label_ind]
             # img_id = target.find('filename').text[:-4]
-
+        #print("#########################################################################################w and h")
+        #print(target.find("size").find("width").text)
+        #print(target.find("size").find("height").text)
         width = int(target.find("size").find("width").text)
         height = int(target.find("size").find("height").text)
+        #width = 1024
+        #height = 1024
         img_info = (height, width)
 
         return res, img_info
@@ -282,7 +287,7 @@ class VOCDetection(Dataset):
 
     def _get_voc_results_file_template(self):
         filename = "comp4_det_test" + "_{:s}.txt"
-        filedir = os.path.join(self.root, "results", "VOC" + self._year, "Main")
+        filedir = os.path.join(self.root, "results")
         if not os.path.exists(filedir):
             os.makedirs(filedir)
         path = os.path.join(filedir, filename)
@@ -317,8 +322,7 @@ class VOCDetection(Dataset):
         #rootpath = os.path.join(self.root, "VOC" + self._year)
         rootpath = self.root
         name = self.image_set[0]
-        annopath = os.path.join(rootpath, "Annotations")
-        annopath = annopath + "/{:s}.xml"
+        annopath = os.path.join(rootpath, "Annotations", "{}.xml")
         imagesetfile = os.path.join(rootpath, "ImageSets", "Main", name + ".txt")
         cachedir = os.path.join(
             self.root, "annotations_cache"
